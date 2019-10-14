@@ -1,7 +1,15 @@
+<button id="button1">Button 1</button>
 <script>
-var connection = new WebSocket('ws://localhost:3000');
-connection.onmessage = function(m){
+var btn1 = document.getElementById("button1");
+btn1.sock = new WebSocket('ws://localhost:3000');
+btn1.sock.onmessage = function(m){
    var server_message = m.data;
    console.log(server_message);
 }
+btn1.addEventListener("click", function() {
+	console.log("clicked button1");
+	console.log(this.sock);
+	this.sock.send("1") 
+});
+
 </script>
