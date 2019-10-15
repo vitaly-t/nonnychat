@@ -1,4 +1,5 @@
-<button id="button1">Button 1</button>
+<button id="button1">Increments 1</button>
+<button id="button2">Increments 2</button>
 <script>
 var btn1 = document.getElementById("button1");
 btn1.sock = new WebSocket('ws://localhost:3000');
@@ -7,9 +8,28 @@ btn1.sock.onmessage = function(m){
    console.log(server_message);
 }
 btn1.addEventListener("click", function() {
-	console.log("clicked button1");
 	console.log(this.sock);
-	this.sock.send("1") 
+	msgdata = {
+		action:"increment",
+		amount:1
+	};
+	this.sock.send(JSON.stringify(msgdata)); 
 });
+
+var btn2 = document.getElementById("button2");
+btn2.sock = new WebSocket('ws://localhost:3000');
+btn2.sock.onmessage = function(m){
+   var server_message = m.data;
+   console.log(server_message);
+}
+btn2.addEventListener("click", function() {
+	console.log(this.sock);
+	msgdata = {
+		action:"increment",
+		amount:2
+	};
+	this.sock.send(JSON.stringify(msgdata)); 
+});
+
 
 </script>

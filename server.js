@@ -14,14 +14,17 @@ const server = express()
 const wss = new SocketServer({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected');
-  ws.on('close', () => console.log('Client disconnected'));
+	ws.counter = 0;
+	console.log('Client connected');
+	ws.on('close', () => console.log('Client disconnected'));
 });
 wss.on('connection', (ws) => {
-  ws.on('message', message => {
-    ws.send(message+"+1="+(parseInt(message)+1));
-  })
-  ws.send('Welcome! You\'re connected.')
+	ws.on('message', message => {
+		let mdata = JSON.parse(message);
+		ws.counter += parseInt(mdata.amount);
+		ws.send("Count: " + ws.counter);
+	})
+	ws.send('Welcome! You\'re connected.')
 })
 
 //// This is happening on the back end and pushing up!
