@@ -1,50 +1,60 @@
-<button id="button1">Increments 1</button>
-<button id="button2">Increments 2</button>
+<div id="login">
+Username: <input type='text' id='username' /><button id="joingame">Join Game</button>
+</div>
+<div id="welcome"></div>
+<hr />
+<div id="output" style="display:none;">
+<button id="button1">Increment!</button> Counter: <label id="counter"></label>
+</div>
 <script>
-var btn1 = document.getElementById("button1");
-btn1.sock = new WebSocket('ws://localhost:3000');
-btn1.sock.onopen = (e) => {
-	console.log(e);
-	msgdata = {
-		action:"init",
-		id:"button1"
-	};
-	e.target.send(JSON.stringify(msgdata));
-}
-btn1.sock.onmessage = function(m){
-   var server_message = m.data;
-   console.log(server_message);
-}
-btn1.addEventListener("click", function() {
-	console.log(this.sock);
-	msgdata = {
-		action:"increment",
-		amount:1
-	};
-	this.sock.send(JSON.stringify(msgdata)); 
-});
 
-var btn2 = document.getElementById("button2");
-btn2.sock = new WebSocket('ws://localhost:3000');
-btn2.sock.onopen = (e) => {
-	msgdata = {
-		action:"init",
-		id:"button2"
-	};
-	btn2.sock.send(JSON.stringify(msgdata));
-}
-btn2.sock.onmessage = function(m){
-   var server_message = m.data;
-   console.log(server_message);
-}
-btn2.addEventListener("click", function() {
-	console.log(this.sock);
-	msgdata = {
-		action:"increment",
-		amount:2
-	};
-	this.sock.send(JSON.stringify(msgdata)); 
-});
+let username = false;
 
+function joingame(username) {
+
+    let sock = new WebSocket('ws://localhost:3000');
+    // When the socket is open and ready to receive/send events
+    sock.onopen = (e) => {
+    //	console.log(e);
+        msgdata = {
+            action:"init",
+            username:username
+        };
+        // sent the JSON for the msgdata object to the target (above)
+        e.target.send(JSON.stringify(msgdata));
+    }
+
+    // When a message is received (from the url above):
+    sock.onmessage = function(m){
+        var x = JSON.parse(m.data);
+        if (x.action=="welcome") {
+            document.querySelector("#welcome").innerHTML = x.content;
+        }
+        if (x.action=="log") {
+            console.log(x.content);
+        }
+        if (x.action=="counter") {
+            document.querySelector("#counter").innerHTML = x.content;
+        }
+    }
+
+    let btn1 = document.querySelector("#button1");
+    btn1.addEventListener("click", () => {
+        msgdata = {
+            action:"increment",
+        };
+        sock.send(JSON.stringify(msgdata)); 
+    });
+}
+
+var btnJoin = document.querySelector("#joingame");
+btnJoin.addEventListener("click", () => {
+    var un = document.querySelector("#username");
+    username = un.value;
+    document.querySelector("#login").style.display = "none";
+    document.querySelector("#output").style.display = "inline";
+    joingame(username);
+});
+//joingame();
 
 </script>
