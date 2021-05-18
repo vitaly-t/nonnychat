@@ -11,7 +11,7 @@ input, button, body {
     margin:1em;
     position:absolute;
     left:1em; right:1em;
-    top:30px;
+    top:70px;
     bottom:70px;
     overflow-y:scroll;
 }
@@ -93,6 +93,8 @@ function logout() {
     document.querySelector("#login").style.display = "block";
     document.querySelector("#logout").style.display = "none";
     document.querySelector("#output").style.display = "none";
+    btnSendMsg.removeEventListener("click", clickSendMessage);
+    sock.close();
     room = false;
     username = false;
 }
