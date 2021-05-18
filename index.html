@@ -29,12 +29,32 @@ input, button, body {
 .chatmsg {
     border:1px solid lightblue;
 }
+div.inline {
+    display:inline-block;
+}
+#instructions {
+    display:none;
+    border:1px solid lightgray;
+    padding:1em;
+}
+
 </style>
 
+<a href="javascript:;" id="btnToggleInstructions">Info / Instructions</a>
+<div id="instructions">
+    <p>
+        Pick any ROOM and NAME that you'd like. Anyone else who picks the same ROOM (case-sensitive!) will see any messages that you type in the form that appears, with the NAME that you choose next to them.
+    </p>
+    <p>
+        None of these messages are stored anywhere, in a database or otherwise. They're just broadcast out to anyone whose browser has made a websocket connection using the same ROOM value as you. Newcomers to the room won't see old messages, and if you leave and come back you'll miss anything that was said in between.
+    </p>
+</div>
+<hr />
+
 <div id="login">
-Room: <input type='text' id='room' /><br />
-Username: <input type='text' id='username' /><br />
-<button id="joingame">Join Game</button>
+    <div class="inline">Room: <input type='text' id='room' /></div>
+    <div class="inline">Name: <input type='text' id='username' /></div>
+    <button id="joingame">Join Chat</button>
 </div>
 <div id="welcome"></div>
 <hr />
@@ -59,6 +79,22 @@ var chatmsg;
 var inputroom;
 var inputusername;
 var btnSendMsg;
+
+var btni = document.querySelector("#btnToggleInstructions");
+var instructions = document.querySelector("#instructions");
+instructions._open = false;
+
+btni.addEventListener("click", function() {
+    if (!instructions._open) {
+        instructions._open = true;
+        instructions.style.display = "block";
+        btni.innerHTML = "[X]";
+    } else {
+        instructions._open = false;
+        instructions.style.display = "none";
+        btni.innerHTML = "Info / Instructions";
+    }
+});
 
 function joingame(username,room) {
 
