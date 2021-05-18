@@ -1,9 +1,7 @@
 
 
 ___ Add a logout action that can be sent from the server
-___ Add logout on disconnect (in case of lost connection, for example)
-
 
 ___ How could "ownership" of room names be established in a temporary way so that people can invite users somehow? That would be a cool functionality.
 
-
+___ Factor in some google login or something? Firebase??

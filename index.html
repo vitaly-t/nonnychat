@@ -85,21 +85,32 @@ var inputroom;
 var inputusername;
 var btnSendMsg;
 var btnPressEnterToSend;
-var sock;
+var sock = false;
 
 var btni = document.querySelector("#btnToggleInstructions");
 var instructions = document.querySelector("#instructions");
 instructions._open = false;
 
-function logout() {
+function logout(opts) {
+    if (typeof opts == "undefined") {
+        opts = {};
+    }
+    if (typeof opts.closeSocket == "undefined") {
+        opts.closeSocket = true;
+    }
+    if (opts.closeSocket) {
+        try {
+            sock.close();
+        } catch(er) {}        
+    }
+    sock = false;
+    room = false;
+    username = false;
     document.querySelector("#login").style.display = "block";
     document.querySelector("#logout").style.display = "none";
     document.querySelector("#output").style.display = "none";
     btnSendMsg.removeEventListener("click", clickSendMessage);
     chatmsg.removeEventListener("keyup", keyupChatMessage);
-    sock.close();
-    room = false;
-    username = false;
 }
 
 btni.addEventListener("click", function() {
@@ -147,6 +158,9 @@ function joingame(username,room) {
     if (username!="" && room !="") {
 
         sock = new WebSocket(HOST);
+        sock.onclose = function(e) {
+            logout({closeSocket:false});
+        };
 
         document.querySelector("#login").style.display = "none";
         document.querySelector("#logout").style.display = "block";
