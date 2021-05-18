@@ -27,7 +27,8 @@ input, button, body {
     width:99%;
 }
 .chatmsg {
-    border:1px solid lightblue;
+    background-color:#eee;
+    margin:1em;
 }
 div.inline {
     display:inline-block;
@@ -59,6 +60,9 @@ div.inline {
     <div class="inline">Name: <input type='text' id='username' /></div>
     <button id="joingame">Join Chat</button>
 </div>
+<div id="logout" style="display:none;">
+    <a href='javascript:logout();'>Log out</a>
+</div>
 <div id="output" style="display:none;">
     <div id="chatlog"></div>
     <div id="chatinput">
@@ -70,7 +74,6 @@ div.inline {
 
 <script>
 
-
 var HOST = location.origin.replace(/^http/, 'ws');
 
 var username = false;
@@ -80,10 +83,19 @@ var chatmsg;
 var inputroom;
 var inputusername;
 var btnSendMsg;
+var sock;
 
 var btni = document.querySelector("#btnToggleInstructions");
 var instructions = document.querySelector("#instructions");
 instructions._open = false;
+
+function logout() {
+    document.querySelector("#login").style.display = "block";
+    document.querySelector("#logout").style.display = "none";
+    document.querySelector("#output").style.display = "none";
+    room = false;
+    username = false;
+}
 
 btni.addEventListener("click", function() {
     if (!instructions._open) {
@@ -97,11 +109,30 @@ btni.addEventListener("click", function() {
     }
 });
 
+function clickSendMessage() {
+    chatmsg.value = chatmsg.value.trim();
+    if (chatmsg.value!="") {
+        msgdata = {
+            action:"chatmsg",
+            message: chatmsg.value,
+            room: room, 
+            username: username
+        };
+        chatmsg.value = "";
+        chatmsg.focus();
+        sock.send(JSON.stringify(msgdata));
+    }
+};
+
+
 function joingame(username,room) {
 
     if (username!="" && room !="") {
 
+        sock = new WebSocket(HOST);
+
         document.querySelector("#login").style.display = "none";
+        document.querySelector("#logout").style.display = "block";
         document.querySelector("#output").style.display = "block";
 
         chatlog = document.querySelector("#chatlog");
@@ -113,24 +144,8 @@ function joingame(username,room) {
         chatmsg.focus();
 
         console.log(btnSendMsg);
-        btnSendMsg.addEventListener("click", function() {
-            chatmsg.value = chatmsg.value.trim();
-            if (chatmsg.value!="") {
-                msgdata = {
-                    action:"chatmsg",
-                    message: chatmsg.value,
-                    room: room, 
-                    username: username
-                };
-                chatmsg.value = "";
-                chatmsg.focus();
-                sock.send(JSON.stringify(msgdata));             
-            }
-        });
+        btnSendMsg.addEventListener("click", clickSendMessage);
 
-
-
-        let sock = new WebSocket(HOST);
         // When the socket is open and ready to receive/send events
         sock.onopen = (e) => {
         //	console.log(e);
