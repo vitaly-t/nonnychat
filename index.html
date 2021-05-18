@@ -127,6 +127,12 @@ function clickSendMessage() {
 };
 
 
+function getDisplayFormat(x) {
+    var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    x = x.replace(up, "<a target='_blank' href='$1'>$1</a>");
+    return x;
+}
+
 function joingame(username,room) {
 
     if (username!="" && room !="") {
@@ -172,7 +178,7 @@ function joingame(username,room) {
             if (x.action=="chatmsg") {
                 var cm = document.createElement("div");            
                 cm.className = "chatmsg";
-                cm.innerHTML = "<em>" + x.content.timestamp + "</em><br /><strong>" + x.content.username + ":</strong> " + x.content.message;
+                cm.innerHTML = "<em>" + x.content.timestamp + "</em><br /><strong>" + x.content.username + ":</strong> " + getDisplayFormat(x.content.message);
                 chatlog.appendChild(cm);
                 chatlog.scrollTop = chatlog.scrollHeight
             }
