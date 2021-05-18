@@ -24,7 +24,7 @@ input, button, body {
     width:99%;
 }
 #btnSendMessage {
-    width:99%;
+    width:50%;
 }
 .chatmsg {
     background-color:#eee;
@@ -68,6 +68,7 @@ div.inline {
     <div id="chatinput">
         <input type="text" id="chatmsg" /> <br />
         <button id="btnSendMessage">Send</button>
+        <input type="checkbox" id="cbPressEnterToSend" /> Press Enter to Send?
     </div>
 </div>
 
@@ -83,6 +84,7 @@ var chatmsg;
 var inputroom;
 var inputusername;
 var btnSendMsg;
+var btnPressEnterToSend;
 var sock;
 
 var btni = document.querySelector("#btnToggleInstructions");
@@ -94,6 +96,7 @@ function logout() {
     document.querySelector("#logout").style.display = "none";
     document.querySelector("#output").style.display = "none";
     btnSendMsg.removeEventListener("click", clickSendMessage);
+    chatmsg.removeEventListener("keyup", keyupChatMessage);
     sock.close();
     room = false;
     username = false;
@@ -126,6 +129,12 @@ function clickSendMessage() {
     }
 };
 
+function keyupChatMessage(e) {
+    if (cbPressEnterToSend.checked && e.keyCode==13) {
+        clickSendMessage();
+    }
+}
+
 
 function getDisplayFormat(x) {
     var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
@@ -148,11 +157,13 @@ function joingame(username,room) {
         inputroom = document.querySelector("#inputroom");
         inputusername = document.querySelector("#inputusername");
         btnSendMsg = document.querySelector("#btnSendMessage");
+        cbPressEnterToSend = document.querySelector("#cbPressEnterToSend");
 
         chatmsg.focus();
 
         console.log(btnSendMsg);
         btnSendMsg.addEventListener("click", clickSendMessage);
+        chatmsg.addEventListener("keyup", keyupChatMessage);
 
         // When the socket is open and ready to receive/send events
         sock.onopen = (e) => {
