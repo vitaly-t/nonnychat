@@ -34,6 +34,9 @@ Username: <input type='text' id='username' />
 
 <script>
 
+
+var HOST = location.origin.replace(/^http/, 'ws');
+
 var username = false;
 var room = false;
 var chatlog;
@@ -73,7 +76,7 @@ function joingame(username,room) {
         }
     });
 
-    let sock = new WebSocket('ws://localhost:3000');
+    let sock = new WebSocket(HOST);
     // When the socket is open and ready to receive/send events
     sock.onopen = (e) => {
     //	console.log(e);
