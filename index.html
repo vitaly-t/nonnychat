@@ -9,6 +9,7 @@
     left:1em; right:1em;
     top:30px;
     bottom:70px;
+    overflow-y:scroll;
 }
 #chatinput {
     position:fixed;
@@ -72,7 +73,6 @@ function joingame(username,room) {
 
         console.log(btnSendMsg);
         btnSendMsg.addEventListener("click", function() {
-            console.log(room, username, chatmsg.value);
             chatmsg.value = chatmsg.value.trim();
             if (chatmsg.value!="") {
                 msgdata = {
@@ -83,7 +83,6 @@ function joingame(username,room) {
                 };
                 chatmsg.value = "";
                 chatmsg.focus();
-        //            chatmsg.scrollIntoView();
                 sock.send(JSON.stringify(msgdata));             
             }
         });
@@ -113,11 +112,11 @@ function joingame(username,room) {
                 console.log(x.content);
             }
             if (x.action=="chatmsg") {
-                console.log(x);
                 var cm = document.createElement("div");            
                 cm.className = "chatmsg";
                 cm.innerHTML = "<em>" + x.content.timestamp + "</em><br /><strong>" + x.content.username + ":</strong> " + x.content.message;
                 chatlog.appendChild(cm);
+                chatlog.scrollTop = chatlog.scrollHeight
             }
         }
 
