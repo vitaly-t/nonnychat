@@ -1,7 +1,5 @@
 
 
-___ Handle URLs (replace a regex with link markup)
-
 ___ Add a logout action that can be sent from the server
 ___ Add logout on disconnect (in case of lost connection, for example)
 
