@@ -1,6 +1,13 @@
 
 
-___ Add a logout action that can be sent from the server
+___ Turn the chat log into a Vue component so I can show a little bit of that too.
+
+
+
+
+___ Refactor to allow specifying the 'room' by going to a URL instead
+
+___ Add a logout action that can be sent from the server and executed locally
 
 ___ How could "ownership" of room names be established in a temporary way so that people can invite users somehow? That would be a cool functionality.
 

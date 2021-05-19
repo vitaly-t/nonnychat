@@ -20,6 +20,7 @@ var btnPressEnterToSend;
 var btni;
 var instructions;
 var btnJoin;
+var vChatLog;
 
 /*
 This logout function will close up the websocket (if still open), 
@@ -85,14 +86,20 @@ function keyupChatMessage(e) {
 
 
 /*
-This just formats the content from the chatmsg messages found in a listener below
-It uses the timestemp, username and message values that are passed in as 'x', 
-and compiles them into a formatted message.
-It also turns URLs into clickable links.
+This function formats our content's message before logging to the chat
+For now, it just turns URLs into clickable links.
 */
-function getDisplayFormat(x) {
+function formatContentMessage(x) {
     var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
     x.message = x.message.replace(up, "<a target='_blank' href='$1'>$1</a>");
+    return x;
+}
+/*
+This function is used to manually format our content.
+When we use Vue instead, we'll just format it in the component template in HTML
+*/
+function getDisplayFormat(x) {
+    x.message = formatContentMessage(x);
     var r = "<em>" + x.timestamp + "</em><br /><strong>" + x.username + ":</strong> " + x.message;
     return r;
 }
@@ -131,6 +138,17 @@ function joingame(username,room) {
         btnSendMsg = document.querySelector("#btnSendMessage");
         cbPressEnterToSend = document.querySelector("#cbPressEnterToSend");
 
+
+        //// Initialize a Vue component for the chatlog
+        vChatLog = new Vue({
+          el: '#chatlog',
+          data: {
+            cms:[
+            ]
+          }
+        })
+
+
         //// Let's place the user's cursor in that chat message box to start.
         chatmsg.focus();
         //// We'll add a listener to the Send button that runs clickSendMessage
@@ -163,6 +181,8 @@ function joingame(username,room) {
             }
             //// If the action value is 'chatmsg', let's log the message to our chat log div
             if (x.action=="chatmsg") {
+
+                /*
                 //// Let's create a new container to hold our message (we'll append to our chat log)
                 var cm = document.createElement("div");            
                 ///// Give it a class name
@@ -171,6 +191,13 @@ function joingame(username,room) {
                 cm.innerHTML = getDisplayFormat(x.content);
                 ///// Append this div to our chat log
                 chatlog.appendChild(cm);
+                */
+
+                //// Format our content using that function above
+                x.content = formatContentMessage(x.content);
+                //// Add x.content to our Vue component's array of content:
+                vChatLog.cms.push({content:x.content});
+
                 //// Scroll the chatlog as far down as possible so we see our new message at the bottom.
                 chatlog.scrollTop = chatlog.scrollHeight
             }
@@ -216,6 +243,9 @@ window.onload = function() {
             btni.innerHTML = "Info / Instructions";
         }
     });
+
+
+
 
     //// Here we're adding a click listener to our Join button to 
     //// initialize a chat using the joingame function

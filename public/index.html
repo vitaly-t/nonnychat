@@ -1,6 +1,12 @@
 
 <html>
     <head>
+        <!--
+        Let's include the Vue.js framework. 
+        We'll use this just a little bit, to display the chat log.
+        Just a nice way to get our toes wet without diving into a Vue.js tutorial, too.
+        -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
         <!-- 
             Let's include our nonnychat JavaScript and CSS files.
             Note that these are in that public folder that can be accessed directly by URL
@@ -37,12 +43,36 @@
         <div id="logout" style="display:none;">
             <a href='javascript:logout();'>Log out</a>
         </div>
+
         <!-- 
         Additionally, this output div now appears with some components used for chatting.
-        THIS WOULD BE AN EXCELLENT PLACE TO USE A VUE COMPONENT.
         -->
         <div id="output" style="display:none;">
-            <div id="chatlog"></div>
+
+            <!--
+            This chatlog div becomes a Vue component in our JavaScript.
+            There's also some (commented out) vanilla JavaScript functionality,
+            but I figured I'd toss in some Vue.js for some bonus learning.
+            -->
+            <div id="chatlog">
+                <div
+                v-for="cm in cms"
+                v-html="cm.content.message"
+                class="vue chatmsg">
+                    <!--
+                    Here we see the template for what will appear for each 'cm' value
+                    contained in the 'cms' array in our components 'data' variable.
+                    See the JavaScript for notes on creating and adding to this component.
+                    -->
+                    <em>{{cm.content.timestamp}}</em><br />
+                    <strong>{{cm.content.username}}</strong><br />
+                    {{cm.content.message}}
+                </div>
+            </div>
+
+            <!--
+            Here's a form for inputting a chat message:
+            -->
             <div id="chatinput">
                 <input type="text" id="chatmsg" /> <br />
                 <button id="btnSendMessage">Send</button>
