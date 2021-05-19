@@ -84,31 +84,46 @@ function keyupChatMessage(e) {
 }
 
 
-//// This just formats each message text a little/
-//// Right now all it does is turn URLs into clickable links
+/*
+This just formats the content from the chatmsg messages found in a listener below
+It uses the timestemp, username and message values that are passed in as 'x', 
+and compiles them into a formatted message.
+It also turns URLs into clickable links.
+*/
 function getDisplayFormat(x) {
     var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-    x = x.replace(up, "<a target='_blank' href='$1'>$1</a>");
-    return x;
+    x.message = x.message.replace(up, "<a target='_blank' href='$1'>$1</a>");
+    var r = "<em>" + x.timestamp + "</em><br /><strong>" + x.username + ":</strong> " + x.message;
+    return r;
 }
 
 
 /*
-This is the big kahuna...
+This is the big kahuna... 
+This function will initialize a websocket connection to the server
+and set a few listeners to handle messages that come back from it.
 */
 function joingame(username,room) {
 
+    //// First make sure neither is blank
     if (username!="" && room !="") {
 
+        //// Set our 'sock' variable to a new websocket connection to that WSHOST url from above
         sock = new WebSocket(WSHOST);
+        //// Specify that if the connection were to close, we should log out
+        //// Note that I included an optional 'closeSocket' boolean in the options
+        //// If that's false, which it is here, it won't try to close the socket
+        //// because it's already closed. This prevents an awkward (endless?) loop.
         sock.onclose = function(e) {
             logout({closeSocket:false});
         };
 
+        //// Now that we're logging in, let's toggle our login closed and the logout/output open
         document.querySelector("#login").style.display = "none";
         document.querySelector("#logout").style.display = "block";
         document.querySelector("#output").style.display = "block";
 
+        //// Since we're showing a few things now, let's make sure we have global references to them
         chatlog = document.querySelector("#chatlog");
         chatmsg = document.querySelector("#chatmsg");
         inputroom = document.querySelector("#inputroom");
@@ -116,38 +131,47 @@ function joingame(username,room) {
         btnSendMsg = document.querySelector("#btnSendMessage");
         cbPressEnterToSend = document.querySelector("#cbPressEnterToSend");
 
+        //// Let's place the user's cursor in that chat message box to start.
         chatmsg.focus();
-
-        console.log(btnSendMsg);
+        //// We'll add a listener to the Send button that runs clickSendMessage
         btnSendMsg.addEventListener("click", clickSendMessage);
+        //// And likewise a listener to the Chat message box that runs keyupChatMessage
         chatmsg.addEventListener("keyup", keyupChatMessage);
 
-        // When the socket is open and ready to receive/send events
+        //// Now let's add a few listeners to our websocket:
+        //// Listen for when the socket is open and ready to receive/send events
         sock.onopen = (e) => {
-        //  console.log(e);
+            //// We'll package an initial message with the info they entered
             msgdata = {
                 action:"init",
                 username:username,
                 room:room
             };
-            // sent the JSON for the msgdata object to the target (above)
+            // // ... and send that info to the server to initialize things (see server.js notes)
             e.target.send(JSON.stringify(msgdata));
         }
 
-        // When a message is received (from the url above):
+        /// When a message is received from the server...
         sock.onmessage = function(m){
+            //// Look for a 'data' string on it (I'm sending that, so it should be there)
+            //// We'll create a variable called 'x' that corresponds to the JSON in 'm.data'
             var x = JSON.parse(m.data);
-            if (x.action=="welcome") {
-//                document.querySelector("#welcome").innerHTML = x.content;
-            }
+            //// If the 'action' value sent in the message is "log", 
             if (x.action=="log") {
+                //// ... then let's just log it to our console.
                 console.log(x.content);
             }
+            //// If the action value is 'chatmsg', let's log the message to our chat log div
             if (x.action=="chatmsg") {
+                //// Let's create a new container to hold our message (we'll append to our chat log)
                 var cm = document.createElement("div");            
+                ///// Give it a class name
                 cm.className = "chatmsg";
-                cm.innerHTML = "<em>" + x.content.timestamp + "</em><br /><strong>" + x.content.username + ":</strong> " + getDisplayFormat(x.content.message);
+                //// Construct the message using that getDisplayFormat function above)
+                cm.innerHTML = getDisplayFormat(x.content);
+                ///// Append this div to our chat log
                 chatlog.appendChild(cm);
+                //// Scroll the chatlog as far down as possible so we see our new message at the bottom.
                 chatlog.scrollTop = chatlog.scrollHeight
             }
         }
@@ -197,8 +221,8 @@ window.onload = function() {
     //// initialize a chat using the joingame function
     btnJoin.addEventListener("click", () => {
         //// Grab the username and room values that the entered
-        username = document.querySelector("#username").value;
-        room = rdocument.querySelector("#room").value;
+        username = document.querySelector("#username").value.trim();
+        room = document.querySelector("#room").value.trim();
         //// Run the joingame function using those two values
         joingame(username, room);
     });
