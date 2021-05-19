@@ -1,4 +1,9 @@
-# websockets practice
+# NonnyChat
+
+## About
+
+This is an anonymous chat app that allows users to create a 'room' of any name, assume a 'username' of their choice, and then have real-time websockets-driven chat with someone else in the same 'room'. I'm developing this in my spare time to practice with Node, Express, Websockets and Vue. So far each of them is used a little, and I'll expand on it as I beef up the app.
+
 
 ## Installation
 
