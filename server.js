@@ -20,18 +20,6 @@ const server = express()
 	;
 
 
-
-/*
-const app = express();
-app.get('/', function(req, res){
-	res.sendFile(path.join(__dirname, 'index.html'));
-});
-app.use('/public', express.static('public'));
-app.listen(PORT, () => {
-	console.log("Listening on PORT " + PORT)
-});
-*/
-
 const wss = new SocketServer({ server });
 wss.on('connection', (ws) => {
 	ws._data = {
