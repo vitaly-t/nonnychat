@@ -1,10 +1,18 @@
 
 <html>
     <head>
+        <!-- 
+            Let's include our nonnychat JavaScript and CSS files.
+            Note that these are in that public folder that can be accessed directly by URL
+            This is why we did that... now we can just link to them the normal way as below:
+        -->
         <script src="/public/nonnychat.js"></script>
         <link rel="stylesheet" type="text/css" href="/public/nonnychat.css" />
     </head>
     <body>
+        <!--
+            Here we're going to have a button to toggle some instructions open and closed, followed by a div containing some paragraphs with those instructions. The JS file above has some code that enables toggling those open and closed I won't go into any more detail about that, since it's not specifically relevant to the tutorial.
+        -->
         <a href="javascript:;" id="btnToggleInstructions">Info / Instructions</a>
         <div id="instructions">
             <p>
@@ -15,15 +23,24 @@
             </p>
         </div>
         <hr />
-
+        <!--
+        Here we find a login div. Logging into this app is simple a matter of picking any 'room' name and a 'username' to go by. These values are then submitted to the server when a websocket connection is made. Any messages you send to the server will be handled as coming from [name] and being broadcast out to anyone else who has an active websocket connection using the same [room] value.
+        -->
         <div id="login">
             <div class="inline">Room: <input type='text' id='room' /></div>
             <div class="inline">Name: <input type='text' id='username' /></div>
             <button id="joingame">Join Chat</button>
         </div>
+        <!-- 
+        Once someone logs in and creates a websocket connection, the login div is hidden and this one is shown instead, so they can disconnect (and "log out").
+        -->
         <div id="logout" style="display:none;">
             <a href='javascript:logout();'>Log out</a>
         </div>
+        <!-- 
+        Additionally, this output div now appears with some components used for chatting.
+        THIS WOULD BE AN EXCELLENT PLACE TO USE A VUE COMPONENT.
+        -->
         <div id="output" style="display:none;">
             <div id="chatlog"></div>
             <div id="chatinput">

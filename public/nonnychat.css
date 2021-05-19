@@ -1,41 +1,49 @@
-        input, button, body {
-            font-size:1.2em;
-            font-family:arial;
-        }
-        #chatlog {
-            margin:auto;
-            background-color:#ddd;
-            padding:1em;
-            margin:1em;
-            position:absolute;
-            left:1em; right:1em;
-            top:70px;
-            bottom:70px;
-            overflow-y:scroll;
-        }
-        #chatinput {
-            position:fixed;
-            left:1em; right: 1em;
-            bottom:1em;
-        }
-        #chatmsg {
-            width:99%;
-        }
-        #btnSendMessage {
-            width:50%;
-        }
-        .chatmsg {
-            background-color:#eee;
-            margin:1em;
-        }
-        div.inline {
-            display:inline-block;
-        }
-        #instructions {
-            position:relative;
-            background-color:white;
-            z-index:10000;
-            display:none;
-            border:1px solid lightgray;
-            padding:1em;
-        }
+
+
+/*
+There's nothing wildly interesting about this CSS, 
+and this isn't a CSS tutorial, 
+so you won't find much of interest in this file.
+*/
+
+input, button, body {
+    font-size:1.2em;
+    font-family:arial;
+}
+#chatlog {
+    margin:auto;
+    background-color:#ddd;
+    padding:1em;
+    margin:1em;
+    position:absolute;
+    left:1em; right:1em;
+    top:70px;
+    bottom:70px;
+    overflow-y:scroll;
+}
+#chatinput {
+    position:fixed;
+    left:1em; right: 1em;
+    bottom:1em;
+}
+#chatmsg {
+    width:99%;
+}
+#btnSendMessage {
+    width:50%;
+}
+.chatmsg {
+    background-color:#eee;
+    margin:1em;
+}
+div.inline {
+    display:inline-block;
+}
+#instructions {
+    position:relative;
+    background-color:white;
+    z-index:10000;
+    display:none;
+    border:1px solid lightgray;
+    padding:1em;
+}
