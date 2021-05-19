@@ -11,13 +11,13 @@ const INDEX = path.join(__dirname, 'index.html');
 
 
 
-const app = express()
-app.get('/', function(req, res){
-	res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-app.use('/public', express.static('public'));
-//app.use((req, res) => res.sendFile(INDEX))
-let server = app.listen(PORT, () => console.log("Listening on PORT " + PORT));
+const server = express()
+	.get('/', function(req, res){
+		res.sendFile(path.join(__dirname, 'public/index.html'));
+	})
+	.use('/public', express.static('public'))
+	.listen(PORT, () => console.log("Listening on PORT " + PORT))
+	;
 
 
 
