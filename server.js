@@ -13,7 +13,7 @@ const INDEX = path.join(__dirname, 'index.html');
 
 const app = express()
 app.get('/', function(req, res){
-	res.sendFile(path.join(__dirname, 'index.html'));
+	res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 app.use('/public', express.static('public'));
 //app.use((req, res) => res.sendFile(INDEX))
