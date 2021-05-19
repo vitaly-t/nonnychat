@@ -1,228 +1,38 @@
 
-<style>
-input, button, body {
-    font-size:1.2em;
-    font-family:arial;
-}
-#chatlog {
-    margin:auto;
-    background-color:#ddd;
-    padding:1em;
-    margin:1em;
-    position:absolute;
-    left:1em; right:1em;
-    top:70px;
-    bottom:70px;
-    overflow-y:scroll;
-}
-#chatinput {
-    position:fixed;
-    left:1em; right: 1em;
-    bottom:1em;
-}
-#chatmsg {
-    width:99%;
-}
-#btnSendMessage {
-    width:50%;
-}
-.chatmsg {
-    background-color:#eee;
-    margin:1em;
-}
-div.inline {
-    display:inline-block;
-}
-#instructions {
-    position:relative;
-    background-color:white;
-    z-index:10000;
-    display:none;
-    border:1px solid lightgray;
-    padding:1em;
-}
+<html>
+    <head>
+        <script src="/public/nonnychat.js"></script>
+        <link rel="stylesheet" type="text/css" href="/public/nonnychat.css" />
+    </head>
+    <body>
+        <a href="javascript:;" id="btnToggleInstructions">Info / Instructions</a>
+        <div id="instructions">
+            <p>
+                Pick any ROOM and NAME that you'd like. Anyone else who picks the same ROOM (case-sensitive!) will see any messages that you type in the form that appears, with the NAME that you choose next to them.
+            </p>
+            <p>
+                None of these messages are stored anywhere, in a database or otherwise. They're just broadcast out to anyone whose browser has made a websocket connection using the same ROOM value as you. Newcomers to the room won't see old messages, and if you leave and come back you'll miss anything that was said in between.
+            </p>
+        </div>
+        <hr />
 
-</style>
-
-<a href="javascript:;" id="btnToggleInstructions">Info / Instructions</a>
-<div id="instructions">
-    <p>
-        Pick any ROOM and NAME that you'd like. Anyone else who picks the same ROOM (case-sensitive!) will see any messages that you type in the form that appears, with the NAME that you choose next to them.
-    </p>
-    <p>
-        None of these messages are stored anywhere, in a database or otherwise. They're just broadcast out to anyone whose browser has made a websocket connection using the same ROOM value as you. Newcomers to the room won't see old messages, and if you leave and come back you'll miss anything that was said in between.
-    </p>
-</div>
-<hr />
-
-<div id="login">
-    <div class="inline">Room: <input type='text' id='room' /></div>
-    <div class="inline">Name: <input type='text' id='username' /></div>
-    <button id="joingame">Join Chat</button>
-</div>
-<div id="logout" style="display:none;">
-    <a href='javascript:logout();'>Log out</a>
-</div>
-<div id="output" style="display:none;">
-    <div id="chatlog"></div>
-    <div id="chatinput">
-        <input type="text" id="chatmsg" /> <br />
-        <button id="btnSendMessage">Send</button>
-        <input type="checkbox" id="cbPressEnterToSend" /> Press Enter to Send?
-    </div>
-</div>
+        <div id="login">
+            <div class="inline">Room: <input type='text' id='room' /></div>
+            <div class="inline">Name: <input type='text' id='username' /></div>
+            <button id="joingame">Join Chat</button>
+        </div>
+        <div id="logout" style="display:none;">
+            <a href='javascript:logout();'>Log out</a>
+        </div>
+        <div id="output" style="display:none;">
+            <div id="chatlog"></div>
+            <div id="chatinput">
+                <input type="text" id="chatmsg" /> <br />
+                <button id="btnSendMessage">Send</button>
+                <input type="checkbox" id="cbPressEnterToSend" /> Press Enter to Send?
+            </div>
+        </div>
 
 
-<script>
-
-var HOST = location.origin.replace(/^http/, 'ws');
-
-var username = false;
-var room = false;
-var chatlog;
-var chatmsg;
-var inputroom;
-var inputusername;
-var btnSendMsg;
-var btnPressEnterToSend;
-var sock = false;
-
-var btni = document.querySelector("#btnToggleInstructions");
-var instructions = document.querySelector("#instructions");
-instructions._open = false;
-
-function logout(opts) {
-    if (typeof opts == "undefined") {
-        opts = {};
-    }
-    if (typeof opts.closeSocket == "undefined") {
-        opts.closeSocket = true;
-    }
-    if (opts.closeSocket) {
-        try {
-            sock.close();
-        } catch(er) {}        
-    }
-    sock = false;
-    room = false;
-    username = false;
-    document.querySelector("#login").style.display = "block";
-    document.querySelector("#logout").style.display = "none";
-    document.querySelector("#output").style.display = "none";
-    btnSendMsg.removeEventListener("click", clickSendMessage);
-    chatmsg.removeEventListener("keyup", keyupChatMessage);
-}
-
-btni.addEventListener("click", function() {
-    if (!instructions._open) {
-        instructions._open = true;
-        instructions.style.display = "block";
-        btni.innerHTML = "[X]";
-    } else {
-        instructions._open = false;
-        instructions.style.display = "none";
-        btni.innerHTML = "Info / Instructions";
-    }
-});
-
-function clickSendMessage() {
-    chatmsg.value = chatmsg.value.trim();
-    if (chatmsg.value!="") {
-        msgdata = {
-            action:"chatmsg",
-            message: chatmsg.value,
-            room: room, 
-            username: username
-        };
-        chatmsg.value = "";
-        chatmsg.focus();
-        sock.send(JSON.stringify(msgdata));
-    }
-};
-
-function keyupChatMessage(e) {
-    if (cbPressEnterToSend.checked && e.keyCode==13) {
-        clickSendMessage();
-    }
-}
-
-
-function getDisplayFormat(x) {
-    var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-    x = x.replace(up, "<a target='_blank' href='$1'>$1</a>");
-    return x;
-}
-
-function joingame(username,room) {
-
-    if (username!="" && room !="") {
-
-        sock = new WebSocket(HOST);
-        sock.onclose = function(e) {
-            logout({closeSocket:false});
-        };
-
-        document.querySelector("#login").style.display = "none";
-        document.querySelector("#logout").style.display = "block";
-        document.querySelector("#output").style.display = "block";
-
-        chatlog = document.querySelector("#chatlog");
-        chatmsg = document.querySelector("#chatmsg");
-        inputroom = document.querySelector("#inputroom");
-        inputusername = document.querySelector("#inputusername");
-        btnSendMsg = document.querySelector("#btnSendMessage");
-        cbPressEnterToSend = document.querySelector("#cbPressEnterToSend");
-
-        chatmsg.focus();
-
-        console.log(btnSendMsg);
-        btnSendMsg.addEventListener("click", clickSendMessage);
-        chatmsg.addEventListener("keyup", keyupChatMessage);
-
-        // When the socket is open and ready to receive/send events
-        sock.onopen = (e) => {
-        //	console.log(e);
-            msgdata = {
-                action:"init",
-                username:username,
-                room:room
-            };
-            // sent the JSON for the msgdata object to the target (above)
-            e.target.send(JSON.stringify(msgdata));
-        }
-
-        // When a message is received (from the url above):
-        sock.onmessage = function(m){
-            var x = JSON.parse(m.data);
-            if (x.action=="welcome") {
-//                document.querySelector("#welcome").innerHTML = x.content;
-            }
-            if (x.action=="log") {
-                console.log(x.content);
-            }
-            if (x.action=="chatmsg") {
-                var cm = document.createElement("div");            
-                cm.className = "chatmsg";
-                cm.innerHTML = "<em>" + x.content.timestamp + "</em><br /><strong>" + x.content.username + ":</strong> " + getDisplayFormat(x.content.message);
-                chatlog.appendChild(cm);
-                chatlog.scrollTop = chatlog.scrollHeight
-            }
-        }
-
-    }
-
-
-
-}
-
-var btnJoin = document.querySelector("#joingame");
-btnJoin.addEventListener("click", () => {
-    var un = document.querySelector("#username");
-    username = un.value;
-    var rm = document.querySelector("#room");
-    room = rm.value;
-    joingame(username, room);
-});
-//joingame();
-
-</script>
+    </body>
+</html>
