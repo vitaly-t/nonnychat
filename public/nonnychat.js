@@ -47,6 +47,7 @@ function logout(opts) {
     document.querySelector("#output").style.display = "none";
     btnSendMsg.removeEventListener("click", clickSendMessage);
     chatmsg.removeEventListener("keyup", keyupChatMessage);
+    inputroom.focus();
 }
 
 /*
@@ -91,7 +92,7 @@ For now, it just turns URLs into clickable links.
 */
 function formatContentMessage(x) {
     var up = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-    x.message = x.message.replace(up, "<a target='_blank' href='$1'>$1</a>");
+    x = x.replace(up, "<a target='_blank' href='$1'>$1</a>");
     return x;
 }
 /*
@@ -99,7 +100,7 @@ This function is used to manually format our content.
 When we use Vue instead, we'll just format it in the component template in HTML
 */
 function getDisplayFormat(x) {
-    x.message = formatContentMessage(x);
+    x.message = formatContentMessage(x.message);
     var r = "<em>" + x.timestamp + "</em><br /><strong>" + x.username + ":</strong> " + x.message;
     return r;
 }
@@ -133,8 +134,6 @@ function joingame(username,room) {
         //// Since we're showing a few things now, let's make sure we have global references to them
         chatlog = document.querySelector("#chatlog");
         chatmsg = document.querySelector("#chatmsg");
-        inputroom = document.querySelector("#inputroom");
-        inputusername = document.querySelector("#inputusername");
         btnSendMsg = document.querySelector("#btnSendMessage");
         cbPressEnterToSend = document.querySelector("#cbPressEnterToSend");
 
@@ -143,8 +142,7 @@ function joingame(username,room) {
         vChatLog = new Vue({
           el: '#chatlog',
           data: {
-            cms:[
-            ]
+            cms:[]
           }
         })
 
@@ -194,9 +192,10 @@ function joingame(username,room) {
                 */
 
                 //// Format our content using that function above
-                x.content = formatContentMessage(x.content);
-                //// Add x.content to our Vue component's array of content:
+                x.content.message = formatContentMessage(x.content.message);
+                //// Push that content to our div
                 vChatLog.cms.push({content:x.content});
+
 
                 //// Scroll the chatlog as far down as possible so we see our new message at the bottom.
                 chatlog.scrollTop = chatlog.scrollHeight
@@ -220,6 +219,10 @@ window.onload = function() {
     btni = document.querySelector("#btnToggleInstructions");
     instructions = document.querySelector("#instructions");
     btnJoin = document.querySelector("#joingame");
+    inputroom = document.querySelector("#room");
+    inputusername = document.querySelector("#username");
+
+    inputroom.focus();
 
     //// Add an "_open" boolean flag to our instructions div
     instructions._open = false;
@@ -244,9 +247,6 @@ window.onload = function() {
         }
     });
 
-
-
-
     //// Here we're adding a click listener to our Join button to 
     //// initialize a chat using the joingame function
     btnJoin.addEventListener("click", () => {
@@ -256,4 +256,9 @@ window.onload = function() {
         //// Run the joingame function using those two values
         joingame(username, room);
     });
+
+    console.log(inputroom);
+//    inputroom.focus();
+
+
 }

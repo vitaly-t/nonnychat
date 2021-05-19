@@ -57,7 +57,6 @@
             <div id="chatlog">
                 <div
                 v-for="cm in cms"
-                v-html="cm.content.message"
                 class="vue chatmsg">
                     <!--
                     Here we see the template for what will appear for each 'cm' value
@@ -65,8 +64,13 @@
                     See the JavaScript for notes on creating and adding to this component.
                     -->
                     <em>{{cm.content.timestamp}}</em><br />
-                    <strong>{{cm.content.username}}</strong><br />
-                    {{cm.content.message}}
+                    <strong>{{cm.content.username}}</strong>
+                    <!--
+                    Using the v-html property here so that HTML will be rendered properly.
+                    If I just output it in the template, the markup will appear as text.
+                    (The content inside the DIV is unnecessary, but included for reference.)
+                    -->
+                    <div v-html="cm.content.message">{{cm.content.message}}</div>
                 </div>
             </div>
 
