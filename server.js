@@ -7,6 +7,8 @@ npm install express
 npm install ws
 */
 
+const {ConnectionString} = require('connection-string');
+
 //// Require the db tools
 const db = require('./db/db');
 
@@ -39,7 +41,8 @@ const server = express()
 		res.sendFile(path.join(__dirname, 'public/index.html'));
 	})
 	.get('/test', function(req, res) {
-		res.send(process.env.CLEARDB_DATABASE_URL);
+		var c = new ConnectionString(process.env.CLEARDB_DATABASE_URL);
+		res.json(c);
 	})
 	.get('/dbSetup', function(req, res) {
 		var query = "\

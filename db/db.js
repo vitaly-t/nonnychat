@@ -1,14 +1,16 @@
 
 var mysql = require('mysql');
 require('dotenv').config()
+const {ConnectionString} = require('connection-string');
 
 var db = {
 	query: (query, callback) => {
+		var c = new ConnectionString(process.env.CLEARDB_DATABASE_URL);
 		var connection = mysql.createConnection({
-		  host     : process.env.DB_HOST,
-		  user     : process.env.DB_USER,
-		  password : process.env.DB_PASSWORD,
-		  database : process.env.DB_DATABASE
+		  host     : c.hosts[0].name,
+		  user     : c.user,
+		  password : c.password,
+		  database : c.path
 		});
 		connection.connect();
 //		connection.query(query, function (error, results, fields) {
