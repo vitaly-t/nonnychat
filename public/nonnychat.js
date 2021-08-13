@@ -257,8 +257,10 @@ window.onload = function() {
         joingame(username, room);
     });
 
-    console.log(inputroom);
-//    inputroom.focus();
-
+    if (CHATROOM!='' && USERNAME!='') {
+        username = USERNAME;
+        room = CHATROOM;
+        joingame(username, room);            
+    }
 
 }

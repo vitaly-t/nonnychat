@@ -35,10 +35,14 @@ const socks = require('ws').Server;
 
 //// Now create and start up a server instance with express, with a few specifications:
 const server = express()
+	//// Use ejs
+	.set('view engine', 'ejs')
+	.use('/public', express.static('public'))
 	//// Specify a 'get' route for the homepage:
 	.get('/', function(req, res){
 		//// We'll just be serving up the index.html that's in the 'public' folder
-		res.sendFile(path.join(__dirname, 'public/index.html'));
+//		res.sendFile(path.join(__dirname, 'public/index.html'));
+		res.render('index', {});
 	})
 	.get('/test', function(req, res) {
 		var c = new ConnectionString(process.env.CLEARDB_DATABASE_URL);
@@ -59,10 +63,16 @@ const server = express()
 		});
 		res.send(query);
 	})
+	.get('/:chatroom/:username', function(req, res) {
+		res.render('index', {
+			chatroom: req.params.chatroom
+			, username: req.params.username
+		})
+	})
+
 	//// We'll also use the /public directory as a static folder
 	//// Anything that goes to /public/whatever. will just serve up whatever.file
 	//// This is useful for using external JS and CSS in our index.html file, for example
-	.use('/public', express.static('public'))
 	//// And finally, let's listen on our PORT so we can visit this app in a browser
 	.listen(PORT, () => console.log("Listening on PORT " + PORT))
 	;
@@ -81,7 +91,7 @@ wss.on('connection', (ws) => {
 						message: mdata.message, username: mdata.username, timestamp: (new Date()).toTimeString()
 					}};
 				//	console.log(m);
-			        ws.send(JSON.stringify(m));					
+			        ws.send(JSON.stringify(m));
 				}
 		    });
 		}

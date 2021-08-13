@@ -12,13 +12,14 @@
             Note that these are in that public folder that can be accessed directly by URL
             This is why we did that... now we can just link to them the normal way as below:
         -->
+        <script>
+        var CHATROOM = '<%= chatroom %>'.trim();
+        var USERNAME = '<%= username %>'.trim();
+        </script>
         <script src="/public/nonnychat.js"></script>
         <link rel="stylesheet" type="text/css" href="/public/nonnychat.css" />
     </head>
     <body>
-        <hr />
-        <%= test %>
-        <hr />
         <!--
             Here we're going to have a button to toggle some instructions open and closed, followed by a div containing some paragraphs with those instructions. The JS file above has some code that enables toggling those open and closed I won't go into any more detail about that, since it's not specifically relevant to the tutorial.
         -->
