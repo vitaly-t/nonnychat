@@ -7,6 +7,8 @@ npm install express
 npm install ws
 */
 
+//// Require the db tools
+const db = require('./db/db');
 
 //// Require the (native) path library for generating paths to files
 const path = require('path');
@@ -35,6 +37,24 @@ const server = express()
 	.get('/', function(req, res){
 		//// We'll just be serving up the index.html that's in the 'public' folder
 		res.sendFile(path.join(__dirname, 'public/index.html'));
+	})
+	.get('/test', function(req, res) {
+		res.send(process.env.CLEARDB_DATABASE_URL);
+	})
+	.get('/dbSetup', function(req, res) {
+		var query = "\
+		CREATE TABLE IF NOT EXISTS nonnychat_messages ( \
+				id int not null auto_increment primary key \
+				, username varchar(50) \
+				, roomname varchar(200) \
+				, messagetext text \
+				, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP \
+			); \
+		";
+		db.query(query, (err, results, fields) => {
+			console.log(results);
+		});
+		res.send(query);
 	})
 	//// We'll also use the /public directory as a static folder
 	//// Anything that goes to /public/whatever. will just serve up whatever.file
